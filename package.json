@@ -1,0 +1,29 @@
+{
+  "name": "getitdone",
+  "version": "1.0.0",
+  "description": "Web tool to help you to get your goals.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josecordaz/getitdone.git"
+  },
+  "keywords": [
+    "admin",
+    "plan",
+    "task",
+    "done",
+    "mongodb",
+    "angular",
+    "express",
+    "nodejs"
+  ],
+  "author": "Jose Ordaz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josecordaz/getitdone/issues"
+  },
+  "homepage": "https://github.com/josecordaz/getitdone#readme"
+}
