@@ -1,0 +1,57 @@
+<div class="ngdialog-message">
+    <div class="">
+        <h3>Set a task {{$rootScope.idGoal}}</h3>
+    </div>
+    <div class="">&nbsp;</div>
+        <div class="">
+            <form ng-submit="saveTask()" name="taskForm" rol="form" novalidate>
+                <div class="form-group" ng-class="{ 'has-error' : taskForm.description.$error.required && !taskForm.description.$pristine }">
+                    <textarea type="text" class="form-control input-sm" id="description" name="description" placeholder="Describe your goal" ng-model="taskData.description" required></textarea>
+                    <span ng-show='taskForm.description.$error.required && !taskForm.description.$pristine' class='help-block'>The description is required.</span>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : (taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine) || invalidDueDate}">
+                    <label for="startDate">Start date</label>
+                    <input type="date" class="form-control input-sm" id="startDate" name="startDate" ng-model="taskData.startDate" required>
+                    <span ng-show='taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine' class='help-block'>Enter a valid due date</span>
+                    <span ng-show='invalidDueDate' class='help-block'>The due date must be afterwards from today</span>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : (taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine) || invalidDueDate}">
+                    <label class="sr-onlya" for="startDate">Days per week</label>
+                    <div class="btn-group btn-group-justified" data-toggle="buttons">
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Mon
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Tue
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Wed
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Thu
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Fri
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Sat
+                      </label>
+                      <label class="btn btn-default">
+                        <input type="checkbox" autocomplete="off">Sun
+                      </label>
+                    </div>
+                    <span ng-show='taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine' class='help-block'>Enter a valid due date</span>
+                    <span ng-show='invalidDueDate' class='help-block'>The due date must be afterwards from today</span>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : (taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine) || invalidDueDate}">
+                    <label class="sr-onlya" for="daysWeek">Pomodoros per day</label>
+                    <input type="number" class="form-control input-sm" id="daysWeek" name="daysWeek" ng-model="taskData.startDate" required>
+                    <span ng-show='taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine' class='help-block'>Enter a valid due date</span>
+                </div>
+                <button type="submit" class="btn btn-info btn-sm" ng-disabled="taskForm.$invalid">Save</button>
+                <button type="button" class="btn btn-default btn-sm" ng-click=closeThisDialog("Cancel")>Cancel</button>
+            </form>
+        </div>
+        <div>
+    </div>
+</div>

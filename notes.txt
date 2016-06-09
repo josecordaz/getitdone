@@ -1,0 +1,5 @@
+node copyDependencies.js [\app\styles\mystyles.css,\bower_components\bootstrap\dist\css\bootstrap.min.css,\bower_components\bootstrap\dist\css\bootstrap-theme.min.css,\bower_components\font-awesome\css\font-awesome.min.css,\bower_components\ng-dialog\css\ngDialog.min.css,\bower_components\ng-dialog\css\ngDialog-theme-plain.min.css,\bower_components\ng-dialog\css\ngDialog-theme-default.min.css] \dist\styles
+
+node copyDependencies.js [\bower_components\moment\moment.js,\bower_components\jquery\dist\jquery.min.js,\bower_components\bootstrap\dist\js\bootstrap.min.js,\bower_components\angular\angular.min.js,\bower_components\angular-ui-router\release\angular-ui-router.min.js,\bower_components\angular-resource\angular-resource.min.js,\app\scripts\app.js,\app\scripts\controllers.js,\app\scripts\services.js,\bower_components\ng-dialog\js\ngDialog.min.js] \dist\scripts
+
+node copyDependencies.js [\bower_components\bootstrap\dist\fonts\glyphicons-halflings-regular.ttf,\bower_components\bootstrap\dist\fonts\glyphicons-halflings-regular.woff,\bower_components\bootstrap\dist\fonts\glyphicons-halflings-regular.woff2] \dist\fonts

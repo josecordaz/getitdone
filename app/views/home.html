@@ -1,0 +1,123 @@
+<div class='container'>
+   <div class='jumbotron text-center'>
+      <h1>Get it done!</h1>
+      <p>Web and mobile tool to help you to get your goals.</p>
+   </div>
+   <div ng-show="username!=''">
+      <div class='row goalTitle'>
+         <div class="col-xs-12 text-center">
+            <h3>Goals</h3>
+         </div>
+         <div class="col-xs-12 text-right buttonBlock">
+            <button class="btn btn-sm btn-primary" ng-click="openAddGoal()">Add Goal</button>
+         </div>
+      </div>
+      <ul class="media-list">
+          <li ng-repeat="goal in goals">
+             <div class="row text-center goalBlock" >
+                <div class="col-xs-12 col-sm-6 spaceCols">
+                   <div class="row">
+                      <div class="col-xs-12 spaceLblTxt">
+                         <b>Description</b>
+                      </div>
+                      <div class="col-xs-12">
+                         {{goal.description}}
+                      </div>
+                   </div>
+                </div>
+                <div class="col-xs-12 col-sm-6 spaceCols">
+                   <div class="row">
+                      <div class="col-xs-12 spaceLblTxt">
+                         <b>Due date</b>
+                      </div>
+                      <div class="col-xs-12">
+                         {{goal.dueDate}}
+                      </div>
+                   </div>
+                </div>
+             </div>
+             <div class="row text-right">
+               <div class="col-xs-12 buttonBlock">
+                    <button class="btn btn-sm btn-primary" ng-click="openAddTask(goal._id)">Add Task</button>
+                </div>
+             </div>
+             <div>&nbsp;</div>
+             <div class='row'  ng-show="goal.tasks.length !== 0">
+                <div class="col-xs-12 text-center">
+                   <h3>Tasks</h3>
+                </div>
+             </div>
+             <div class="taskSeparator" ng-show="goal.tasks.length !== 0"></div>
+             <ul class="media-list">
+                <li ng-repeat="task in goal.tasks">
+                    <div class="row text-center">
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Description</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.description}}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Start date</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.startDate}}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Days at week</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.daysWeek}}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Pomodoros per day</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.pomodorosPerDay}}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="row text-center">
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Worked pomodoros</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.workedPomodoros.length}}
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-3 spaceCols">
+                           <div class="row">
+                              <div class="col-xs-12 spaceLblTxt">
+                                 <b>Hours worked</b>
+                              </div>
+                              <div class="col-xs-12">
+                                 {{task.hoursWorded}}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                    <div class="taskSeparator"></div>
+                </li>
+              </ul>
+          </li>
+        </ul>
+   </div>
+</div>

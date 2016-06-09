@@ -1,57 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" ng-app="getItDoneApp">
 	<head>
+		<meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Get it done!</title>
 
-		<!-- build:js js/site.js -->
-		<script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
-		<script type="text/javascript" src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-		<!-- endbuild -->
-
-		<!-- build:css css/site.css -->
-		<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="css/mystyles.css">
+		<!-- build:css styles/main.css -->
+		<link href="styles/mystyles.css" rel="stylesheet">
+		<link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="../bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+	    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	    <link href="../bower_components/ng-dialog/css/ngDialog.min.css" rel="stylesheet">
+	    <link href="../bower_components/ng-dialog/css/ngDialog-theme-plain.min.css" rel="stylesheet">
+	    <link href="../bower_components/ng-dialog/css/ngDialog-theme-default.min.css" rel="stylesheet">
 		<!-- endbuild -->
 	</head>
 	<body>
-		<div class = 'navbar navbar-inverse'>
-			<div class = 'container'>
-				<div class='container-fluid'>
-					<ul class='nav navbar-nav'>
-						<li class='active'><a href="#">Start</a></li>
-						<li class=''><a href="#">Pomodoro</a></li>
-						<li class=''><a href="#">Configs</a></li>
-						<li class=''><a href="#">Settings</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
-		<div class='container'>
-			<div class='jumbotron text-center'>
-				<h1>Get it done!</h1>
-				<p>Web and mobile tool to help you to get your goals.</p>
-			</div>
-			<div class='row'>
-				<div class='col-xs-2'>
-					<div class = 'row text-center'>
-						<ul class = ''>
-							<li>Goals</li>
-						</ul>
-					</div>
-				</div>
-				<div class='col-xs-10'>
-					<div class='row'>
-						<form>
-							<label>Goals</label>
-							<select class="form-control">
-							  <option>Obtener la licencia</option>
-							  <option>Tener un abdomen de lavadero</option>
-							  <option>Obtener el certificado de FreeCodeCamp</option>
-							</select>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+		<div ui-view="header"></div>
+	    <div ui-view="content"></div>
+
+		
+		
+
+		<!-- build:js scripts/main.js -->
+		<script src="../bower_components/moment/moment.js"></script>
+		<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="../bower_components/angular/angular.min.js"></script>
+	    <script src="../bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+	    <script src="../bower_components/angular-resource/angular-resource.min.js"></script>
+	    <script src="scripts/app.js"></script>
+	    <script src="scripts/controllers.js"></script>
+	    <script src="scripts/services.js"></script>
+	   	<script src="../bower_components/ng-dialog/js/ngDialog.min.js"></script>
+		<!-- endbuild -->
+
 	</body>
 </html>
