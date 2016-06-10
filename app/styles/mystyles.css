@@ -36,3 +36,8 @@ body {
 	padding-top: 5px;
 	padding-right: 0px;
 }
+
+.clock {
+	font-size: 70px;
+	padding: 30px;
+}

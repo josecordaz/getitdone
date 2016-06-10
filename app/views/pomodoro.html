@@ -1,0 +1,25 @@
+<div class="container">
+	<div class="row">
+		<div class="col-xs-4 col-xs-offset-4">
+			<select class="form-control" ng-model="feedback.mychannel" ng-options="goal.value as goal.description for goal in goals">
+                <option value="">&nbsp;</option>
+            </select>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 text-center">
+			<label class="clock">00:00</label>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-2 col-sm-offset-3 text-right">
+			<button class="btn btn-success btn-lg">Start</button>
+		</div>
+		<div class="col-xs-12 col-sm-2 text-center">
+			<button class="btn btn-danger btn-lg">Stop</button>
+		</div>
+		<div class="col-xs-12 col-sm-2 text-left">
+			<button class="btn btn-warning btn-lg">Reset</button>
+		</div>
+	</div>
+</div>

@@ -185,51 +185,59 @@ angular.module('getItDoneApp')
     };
 
     $scope.saveTask = function(){
+        $scope.invalidStartDate = false;
+        $scope.invalidDaysWeek = false;
 
-        var keys = Object.keys($scope.taskData.daysWeek);
-        var tmpValues = [];
+        var due = new Date($scope.taskData.startDate);
+        var hoy = new Date();
+        if(hoy > due){
+            $scope.invalidStartDate = true;
+        } else if(!$scope.taskData.daysWeek){
+            $scope.invalidDaysWeek = true;
+        } else{
+            var keys = Object.keys($scope.taskData.daysWeek);
+            var tmpValues = [];
 
-        keys.forEach(function(key){
-            if ($scope.taskData.daysWeek[key]){
-                tmpValues.push(key);
-            }
-        });
-
-        $scope.taskData.daysWeek = tmpValues;
-
-
-        taskFactory.save({idGoal:$scope.goal._id,idTask:0},$scope.taskData).$promise.then(
-            function(){
-                    $rootScope.$broadcast('updateGoals');
-                    ngDialog.close();
-                },
-            function (response) {
-                var descriptionErrores = '';
-                if(!!response.data.error.errores){
-                    var errores = Object.keys(response.data.error.errors);
-                    errores.forEach(function(err){
-                        descriptionErrores =  response.data.error.errors[err].message;
-                    });
+            keys.forEach(function(key){
+                if ($scope.taskData.daysWeek[key]){
+                    tmpValues.push(key);
                 }
-                var message = ''+
-                '<div class="ngdialog-message">'+
-                '<div><h3>Error '+response.status+' </h3></div>' +
-                '<div><p>'+response.data.message+'</p><p>'+descriptionErrores+
-                '</p></div>'+
-                '<div class="ngdialog-buttons">'+
-                '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
-                '</div>';
-                ngDialog.openConfirm({ template: message, plain: 'true'});
-            }
-        );
+            });
+
+            $scope.taskData.daysWeek = tmpValues;
+
+
+            taskFactory.save({idGoal:$scope.goal._id,idTask:0},$scope.taskData).$promise.then(
+                function(){
+                        $rootScope.$broadcast('updateGoals');
+                        ngDialog.close();
+                    },
+                function (response) {
+                    var descriptionErrores = '';
+                    if(!!response.data.error.errores){
+                        var errores = Object.keys(response.data.error.errors);
+                        errores.forEach(function(err){
+                            descriptionErrores =  response.data.error.errors[err].message;
+                        });
+                    }
+                    var message = ''+
+                    '<div class="ngdialog-message">'+
+                    '<div><h3>Error '+response.status+' </h3></div>' +
+                    '<div><p>'+response.data.message+'</p><p>'+descriptionErrores+
+                    '</p></div>'+
+                    '<div class="ngdialog-buttons">'+
+                    '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
+                    '</div>';
+                    ngDialog.openConfirm({ template: message, plain: 'true'});
+                }
+            );
+        }
     };
 }])
-.controller('HomeController', ['$scope','$rootScope','ngDialog','goalsFactory','taskFactory',function ($scope,$rootScope,ngDialog,goalsFactory,taskFactory) {
+.controller('HomeController', ['$scope','$rootScope','ngDialog','goalsFactory','taskFactory','AuthFactory',function ($scope,$rootScope,ngDialog,goalsFactory,taskFactory,AuthFactory) {
 
     $scope.deleteOption = false;
 
-    $rootScope.username = "";
-    $scope.goals = [];
 
     $scope.openAddGoal = function () {
         ngDialog.open({ template: 'views/addGoal.html', scope: $scope, className: 'ngdialog-theme-default', controller:"GoalController" });
@@ -266,7 +274,9 @@ angular.module('getItDoneApp')
     };
 
     //$rootScope.$broadcast('updateGoals', 'message');
-    $scope.$on('updateGoals', function () { 
+    //$rootScope.$broadcast('updateGoals');
+
+    var updateGoals = function(){
         goalsFactory.query({}).$promise.then(
             function (response) {
                 response = response.map(function(val){
@@ -279,13 +289,25 @@ angular.module('getItDoneApp')
                     });
                     return val;
                 });
-                $scope.goals = response;
+                $rootScope.goals = response;
+                $scope.goals = $rootScope.goals;
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
             }
         );
+    };
+
+    $scope.$on('updateGoals', function () { 
+        updateGoals();
     });
+
+
+    if (AuthFactory.isAuthenticated) {
+        $rootScope.username = AuthFactory.getUsername();
+        updateGoals();
+    }
+    
 }])
 
 .controller('AboutController', ['$scope', 'corporateFactory', function ($scope, corporateFactory) {
@@ -387,6 +409,23 @@ angular.module('getItDoneApp')
        return $state.is(curstate);  
     };
     
+}])
+
+.controller('PomodoroController',['$scope','$rootScope',function($scope,$rootScope){
+    $scope.feedback = {};
+
+     /*var channels = [{
+        value: "tel",
+        label: "Tel."
+    }, {
+        value: "Email",
+        label: "Email"
+    }];*/
+
+    $rootScope.$broadcast('updateGoals');
+    //$scope.goals = $rootScope.goals;
+
+    //$scope.channels = channels;
 }])
 
 .controller('LoginController', ['$scope', 'ngDialog', '$localStorage', 'AuthFactory', function ($scope, ngDialog, $localStorage, AuthFactory) {

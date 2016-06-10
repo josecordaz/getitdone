@@ -7,16 +7,16 @@
         <div class="">
             <form ng-submit="saveTask()" name="taskForm" rol="form" novalidate>
                 <div class="form-group" ng-class="{ 'has-error' : taskForm.description.$error.required && !taskForm.description.$pristine }">
-                    <textarea type="text" class="form-control input-sm" id="description" name="description" placeholder="Describe your tasj" ng-model="taskData.description" required></textarea>
+                    <textarea type="text" class="form-control input-sm" id="description" name="description" placeholder="Describe your task" ng-model="taskData.description" required></textarea>
                     <span ng-show='taskForm.description.$error.required && !taskForm.description.$pristine' class='help-block'>The description is required.</span>
                 </div>
-                <div class="form-group"><!--ng-class="{ 'has-error' : (taskForm.startDate.$invalid && !taskForm.startDate.$pristine)}"-->
+                <div class="form-group" ng-class="{ 'has-error' : (taskForm.startDate.$invalid && !taskForm.startDate.$pristine) || invalidStartDate}">
                     <label for="startDate">Start date</label>
                     <input type="date" class="form-control input-sm" id="startDate" name="startDate" ng-model="taskData.startDate" required>
-                    <span ng-show='taskForm.startDate.$invalid && !taskForm.startDate.$pristine' class='help-block'>Enter a valid due date</span>
-                    <!--span ng-show='invalidDueDate' class='help-block'>The due date must be afterwards from today</span-->
+                    <span ng-show='taskForm.startDate.$invalid && !taskForm.startDate.$pristine' class='help-block'>Enter a valid date</span>
+                    <span ng-show='invalidStartDate' class='help-block'>The start date must be after from today</span>
                 </div>
-                <div class="form-group" ng-class="{ 'has-error' : (taskForm.dueDate2.$invalid && !taskForm.dueDate2.$pristine) || invalidDueDate2}">
+                <div class="form-group" ng-class="{ 'has-error' : invalidDaysWeek}">
                     <label>Days per week</label>
                     <div class="btn-group btn-group-justified" data-toggle="buttons">
                       <label class="btn btn-default">
@@ -41,11 +41,10 @@
                         <input type="checkbox" autocomplete="off" ng-model="taskData.daysWeek.Sun">Sun
                       </label>
                     </div>
-                    <!--span ng-show='taskForm.dueDate.$invalid && !taskForm.dueDate.$pristine' class='help-block'>Enter a valid due date</span>
-                    <span ng-show='invalidDueDate' class='help-block'>The due date must be afterwards from today</span-->
+                    <span ng-show='invalidDaysWeek' class='help-block'>You must choose at least one day</span>
                 </div>
                 <div class="form-group" ng-class="{ 'has-error' : taskForm.pomodorosPerDay.$error.required && !taskForm.pomodorosPerDay.$pristine}">
-                    <label class="sr-onlya" for="pomodorosPerDay">Pomodoros per day</label>
+                    <label for="pomodorosPerDay">Pomodoros per day</label>
                     <input type="number" class="form-control input-sm" id="pomodorosPerDay" name="pomodorosPerDay" ng-model="taskData.pomodorosPerDay" required>
                     <span ng-show='taskForm.pomodorosPerDay.$error.required && !taskForm.pomodorosPerDay.$pristine' class='help-block'>Enter a valid due date</span>
                 </div>

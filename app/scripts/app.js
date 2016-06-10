@@ -20,59 +20,13 @@ angular.module('getItDoneApp', ['ui.router','ngResource','ngDialog'])
                 }
 
             })
-        
-            // route for the aboutus page
-            .state('app.aboutus', {
-                url:'aboutus',
+            .state('app.pomodoro', {
+                url:'pomodoro',
                 views: {
                     'content@': {
-                        templateUrl : 'views/aboutus.html',
-                        controller  : 'AboutController'                  
+                        templateUrl : 'views/pomodoro.html',
+                        controller  : 'PomodoroController'                  
                     }
-                }
-            })
-        
-            // route for the contactus page
-            .state('app.contactus', {
-                url:'contactus',
-                views: {
-                    'content@': {
-                        templateUrl : 'views/contactus.html',
-                        controller  : 'ContactController'                  
-                    }
-                }
-            })
-
-            // route for the menu page
-            .state('app.menu', {
-                url: 'menu',
-                views: {
-                    'content@': {
-                        templateUrl : 'views/menu.html',
-                        controller  : 'MenuController'
-                    }
-                }
-            })
-
-            // route for the dishdetail page
-            .state('app.dishdetails', {
-                url: 'menu/:id',
-                views: {
-                    'content@': {
-                        templateUrl : 'views/dishdetail.html',
-                        controller  : 'DishDetailController'
-                   }
-                }
-            })
-        
-            // route for the dishdetail page
-            .state('app.favorites', {
-                url: 'favorites',
-                views: {
-                    'content@': {
-                        templateUrl : 'views/favorites.html',
-                        controller  : 'FavoriteController'
-                   }
                 }
             });
     

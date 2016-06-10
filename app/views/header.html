@@ -9,28 +9,27 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="#">Get It Done!</a>
+              <a class="navbar-brand" ui-sref="app">Get It Done!</a>
             </div>
-
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class='nav navbar-nav'>
-                <li class='active'><a href="#">Home</a></li>
-                <li class=''><a href="#">Pomodoro</a></li>
-                <li class=''><a href="#">Configs</a></li>
-                <li class=''><a href="#">Settings</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li ng-if="!loggedIn"><a ng-click="openLogin()">
-                    <span class="glyphicon glyphicon-log-in"></span> Login</a>
+                <ul class='nav navbar-nav'>
+                    <li ng-class="{active: stateis('app')}"><a ui-sref="app">Home</a></li>
+                    <li ng-class="{active: stateis('app.pomodoro')}"><a ui-sref="app.pomodoro">Pomodoro</a></li>
+                    <!--li class=''><a href="#">Configs</a></li>
+                    <li class=''><a href="#">Settings</a></li-->
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-if="!loggedIn"><a ng-click="openLogin()">
+                        <span class="glyphicon glyphicon-log-in"></span> Login</a>
+                        </li>
+                        <li ng-if="loggedIn">
+                        <a>{{username}}</a>
+                        </li>
+                        <li ng-if="loggedIn">
+                        <a ng-click="logOut()">
+                        <span class="glyphicon glyphicon-log-in"></span> Logout</a>
                     </li>
-                    <li ng-if="loggedIn">
-                    <a>{{username}}</a>
-                    </li>
-                    <li ng-if="loggedIn">
-                    <a ng-click="logOut()">
-                    <span class="glyphicon glyphicon-log-in"></span> Logout</a>
-                </li>
-            </ul>
+                </ul>
             </div>
         </div>
     </div>
