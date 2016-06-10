@@ -134,10 +134,10 @@ angular.module('getItDoneApp')
 }])
 
 // implement the IndexController and About Controller here
-.controller('GoalController',['$scope','ngDialog','goalsFactory','AuthFactory',function($scope,ngDialog,goalsFactory,AuthFactory){
+.controller('GoalController',['$scope','ngDialog','goalsFactory','$rootScope',function($scope,ngDialog,goalsFactory,$rootScope){
     $scope.goalData = {
         description:"",
-        dueDate:null
+        dueDate:new Date()
     };
     $scope.invalidDueDate = false;
 
@@ -148,7 +148,10 @@ angular.module('getItDoneApp')
             $scope.invalidDueDate = true;
         } else {
             goalsFactory.save($scope.goalData).$promise.then(
-                null,
+                function(){
+                    $rootScope.$broadcast('updateGoals');
+                    ngDialog.close();
+                },
                 function (response) {
                     var descriptionErrores = '';
                     
@@ -167,29 +170,41 @@ angular.module('getItDoneApp')
                     '<div class="ngdialog-buttons">'+
                         '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
                     '</div>';
-                    if(response.data.error.status === 401){
-                        AuthFactory.logout();
-                    }
                     ngDialog.openConfirm({ template: message, plain: 'true'});
                 }
             );
-            ngDialog.close();
         }
     };
 }])
-.controller('TaskController',['$scope','taskFactory','AuthFactory','ngDialog',function($scope,taskFactory,AuthFactory,ngDialog){
+.controller('TaskController',['$scope','$rootScope','taskFactory','AuthFactory','ngDialog',function($scope,$rootScope,taskFactory,AuthFactory,ngDialog){
     $scope.taskData = {
         description:"",
-        startDate:null,
+        startDate:new Date(),
         daysWeek:null,
-        pomodorosPerDay:0
+        pomodorosPerDay:null
     };
 
     $scope.saveTask = function(){
-        taskFactory.save($scope.goalData).$promise.then(
-            function () {},
+
+        var keys = Object.keys($scope.taskData.daysWeek);
+        var tmpValues = [];
+
+        keys.forEach(function(key){
+            if ($scope.taskData.daysWeek[key]){
+                tmpValues.push(key);
+            }
+        });
+
+        $scope.taskData.daysWeek = tmpValues;
+
+
+        taskFactory.save({idGoal:$scope.goal._id,idTask:0},$scope.taskData).$promise.then(
+            function(){
+                    $rootScope.$broadcast('updateGoals');
+                    ngDialog.close();
+                },
             function (response) {
-            var descriptionErrores = '';
+                var descriptionErrores = '';
                 if(!!response.data.error.errores){
                     var errores = Object.keys(response.data.error.errors);
                     errores.forEach(function(err){
@@ -204,66 +219,55 @@ angular.module('getItDoneApp')
                 '<div class="ngdialog-buttons">'+
                 '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
                 '</div>';
-                if(response.data.error.status === 401){
-                    AuthFactory.logout();
-                }
                 ngDialog.openConfirm({ template: message, plain: 'true'});
             }
         );
-
-        /*var due = new Date($scope.goalData.dueDate);
-
-
-
-        var hoy = new Date();
-        if(hoy > due){
-            $scope.invalidDueDate = true;
-        } else {
-            goalsFactory.save($scope.goalData).$promise.then(
-                function (response) {},
-                function (response) {
-                    var descriptionErrores = '';
-                    
-                    if(!!response.data.error.errores){
-                        var errores = Object.keys(response.data.error.errors);
-                        errores.forEach(function(err){
-                            descriptionErrores =  response.data.error.errors[err].message;
-                        });
-                    }
-
-                    var message = '\
-                    <div class="ngdialog-message">\
-                    <div><h3>Error '+response.status+' </h3></div>' +
-                      '<div><p>' +  response.data.message + '</p><p>' +descriptionErrores
-                         + '</p></div>' +
-                    '<div class="ngdialog-buttons">\
-                        <button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>\
-                    </div>';
-                    if(response.data.error.status == 401){
-                        AuthFactory.logout();
-                    }
-                    ngDialog.openConfirm({ template: message, plain: 'true'});
-                }
-            );
-            ngDialog.close();
-        }*/
     };
 }])
-.controller('HomeController', ['$scope','$rootScope','ngDialog','AuthFactory','goalsFactory',function ($scope,$rootScope,ngDialog,AuthFactory,goalsFactory) {
+.controller('HomeController', ['$scope','$rootScope','ngDialog','goalsFactory','taskFactory',function ($scope,$rootScope,ngDialog,goalsFactory,taskFactory) {
+
+    $scope.deleteOption = false;
+
+    $rootScope.username = "";
+    $scope.goals = [];
+
     $scope.openAddGoal = function () {
         ngDialog.open({ template: 'views/addGoal.html', scope: $scope, className: 'ngdialog-theme-default', controller:"GoalController" });
     };
-    $scope.openAddTask = function (idGoal) {
-        $rootScope.idGoal = idGoal;
+    $scope.openAddTask = function (goal) {
+        $rootScope.goal = goal;
         ngDialog.open({ template: 'views/addTask.html', scope: $scope, className: 'ngdialog-theme-default', controller:"TaskController" });
     };
 
-    //$rootScope.username = "";
-    $rootScope.username = AuthFactory.getUsername();
+    $scope.showDeleteButtons = function(){
+        $scope.deleteOption = !$scope.deleteOption;
+    };
 
-    if($rootScope.username !== ''){
-        goalsFactory.query({})
-        .$promise.then(
+    $scope.deleteGoal = function(idGoal){
+        $scope.deleteOption = false;
+        goalsFactory.delete({goalId:idGoal},
+            function(){
+                $rootScope.$broadcast('updateGoals');
+            },function(){
+                console.log('Error');
+            }
+        );
+    };
+
+    $scope.deleteTask = function(idGoal,idTask){
+        $scope.deleteOption = false;
+        taskFactory.delete({idGoal:idGoal,idTask:idTask},
+            function(){
+                $rootScope.$broadcast('updateGoals');
+            },function(){
+                console.log('Error');
+            }
+        );
+    };
+
+    //$rootScope.$broadcast('updateGoals', 'message');
+    $scope.$on('updateGoals', function () { 
+        goalsFactory.query({}).$promise.then(
             function (response) {
                 response = response.map(function(val){
                     val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
@@ -275,56 +279,13 @@ angular.module('getItDoneApp')
                     });
                     return val;
                 });
-                $rootScope.goals = response;
+                $scope.goals = response;
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
             }
         );
-    }
-    /*$scope.showDish = false;
-    $scope.showLeader = false;
-    $scope.showPromotion = false;
-    $scope.message = "Loading ...";
-    var leaders = corporateFactory.query({
-            featured: "true"
-        })
-        .$promise.then(
-            function (response) {
-                var leaders = response;
-                $scope.leader = leaders[0];
-                $scope.showLeader = true;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
-    $scope.dish = menuFactory.query({
-            featured: "true"
-        })
-        .$promise.then(
-            function (response) {
-                var dishes = response;
-                $scope.dish = dishes[0];
-                $scope.showDish = true;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
-    var promotions = promotionFactory.query({
-        featured: "true"
-    })
-    .$promise.then(
-            function (response) {
-                var promotions = response;
-                $scope.promotion = promotions[0];
-                $scope.showPromotion = true;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );*/
+    });
 }])
 
 .controller('AboutController', ['$scope', 'corporateFactory', function ($scope, corporateFactory) {
@@ -385,7 +346,7 @@ angular.module('getItDoneApp')
     };
 }])
 
-.controller('HeaderController', ['$scope', '$state', '$rootScope', 'ngDialog', 'AuthFactory','goalsFactory',function ($scope, $state, $rootScope, ngDialog, AuthFactory,goalsFactory) {
+.controller('HeaderController', ['$scope', '$state', '$rootScope', 'ngDialog', 'AuthFactory',function ($scope, $state, $rootScope, ngDialog, AuthFactory) {
 
     $scope.loggedIn = false;
     $scope.username = '';
@@ -394,24 +355,7 @@ angular.module('getItDoneApp')
         $scope.loggedIn = true;
         $scope.username = AuthFactory.getUsername();
         $rootScope.username = AuthFactory.getUsername();
-        goalsFactory.query({}).$promise.then(
-            function (response) {
-                response = response.map(function(val){
-                    val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
-                    val.tasks = val.tasks.map(function(task){
-                        task.startDate = moment(task.startDate).format("dddd, MMM DD, YYYY");
-                        task.daysWeek = task.daysWeek.join(", ");
-                        task.hoursWorded = Math.round(task.workedPomodoros.length * (25/60) * 100)/100;
-                        return task;
-                    });
-                    return val;
-                });
-                $rootScope.goals = response;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
+        $rootScope.$broadcast('updateGoals');
     }
         
     $scope.openLogin = function () {
@@ -430,24 +374,7 @@ angular.module('getItDoneApp')
         $scope.loggedIn = AuthFactory.isAuthenticated();
         $scope.username = AuthFactory.getUsername();
         $rootScope.username = AuthFactory.getUsername();
-        goalsFactory.query({}).$promise.then(
-            function (response) {
-                response = response.map(function(val){
-                    val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
-                    val.tasks = val.tasks.map(function(task){
-                        task.startDate = moment(task.startDate).format("dddd, MMM DD, YYYY");
-                        task.daysWeek = task.daysWeek.join(", ");
-                        task.hoursWorded = Math.round(task.workedPomodoros.length * (25/60) * 100)/100;
-                        return task;
-                    });
-                    return val;
-                });
-                $rootScope.goals = response;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
+        $rootScope.$broadcast('updateGoals');
     });
         
     $rootScope.$on('registration:Successful', function () {
@@ -487,11 +414,8 @@ angular.module('getItDoneApp')
     
     $scope.doRegister = function() {
         console.log('Doing registration', $scope.registration);
-
         AuthFactory.register($scope.registration);
-        
         ngDialog.close();
-
     };
 }])
 ;

@@ -4,16 +4,22 @@ angular.module('getItDoneApp')
 .constant("baseURL", "http://localhost:6002/")
 //.constant("baseURL", "https://localhost:3443/")
 .factory('taskFactory',['$resource','baseURL',function($resource,baseURL){
-    return $resource(baseURL+"goals/:id/tasks",null,{
+    return $resource(baseURL+"goals/:idGoal/tasks/:idTask",{idGoal:"@IdGoal",idTask:"@IdTask"},{
       'update':{
         method:'PUT'
+      },
+      'delete':{
+        method:'DELETE'
       }
     });
 }])
 .factory('goalsFactory',['$resource','baseURL',function($resource,baseURL){
-    return $resource(baseURL+"goals/:id",null,{
+    return $resource(baseURL+"goals/:id",{goalId:"@GoalId"},{
       'update':{
         method:'PUT'
+      },
+      'delete':{
+        method:'DELETE'
       }
     });
 }])
@@ -82,7 +88,7 @@ angular.module('getItDoneApp')
         }
     };
 }])
-.factory('AuthFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog){
+.factory('AuthFactory', ['$resource', '$http', '$localStorage', '$rootScope', '$window', 'baseURL', 'ngDialog', 'goalsFactory',function($resource, $http, $localStorage, $rootScope, $window, baseURL, ngDialog,goalsFactory){
     
     var authFac = {};
     var TOKEN_KEY = 'Token';
@@ -91,19 +97,20 @@ angular.module('getItDoneApp')
     var authToken;
     
     function useCredentials(credentials) {
-    isAuthenticated = true;
-    username = credentials.username;
-    authToken = credentials.token;
- 
-    // Set the token as header for your requests!
-    $http.defaults.headers.common['x-access-token'] = authToken;
-  }
+      isAuthenticated = true;
+      username = credentials.username;
+      authToken = credentials.token;
+   
+      // Set the token as header for your requests!
+      $http.defaults.headers.common['x-access-token'] = authToken;
+    }
 
   function loadUserCredentials() {
     var credentials = $localStorage.getObject(TOKEN_KEY,'{}');
     if (credentials.username !== undefined) {
       useCredentials(credentials);
-    }
+      authFac.login($localStorage.getObject('userinfo','{}'));
+    } 
   }
  
   function storeUserCredentials(credentials) {
@@ -121,26 +128,52 @@ angular.module('getItDoneApp')
     $localStorage.remove(TOKEN_KEY);
   }
      
-    authFac.login = function(loginData) {
+    authFac.login = function(loginData,flagLogInAgain,username) {
         $resource(baseURL + "users/login")
         .save(loginData,
            function(response) {
-              storeUserCredentials({username:loginData.username, token: response.token});
+              storeUserCredentials({username:!!username?username:loginData.username, token: response.token});
               $rootScope.$broadcast('login:Successful');
+
+              goalsFactory.query({})
+              .$promise.then(
+                  function (response) {
+                      response = response.map(function(val){
+                          val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
+                          val.tasks = val.tasks.map(function(task){
+                              task.startDate = moment(task.startDate).format("dddd, MMM DD, YYYY");
+                              task.daysWeek = task.daysWeek.join(", ");
+                              task.hoursWorded = Math.round(task.workedPomodoros.length * (25/60) * 100)/100;
+                              return task;
+                          });
+                          return val;
+                      });
+                      $rootScope.goals = response;
+                  },
+                  function (response) {
+                      //$scope.message = 
+                      console.log("Error: " + response.status + " " + response.statusText);
+                  }
+              );
+
            },
            function(response){
-              isAuthenticated = false;
-            
-              var message = ''+
-                '<div class="ngdialog-message">'+
-                '<div><h3>Login Unsuccessful</h3></div>' +
-                  '<div><p>' +  response.data.err.message + '</p><p>' +
-                    response.data.err.name + '</p></div>' +
-                '<div class="ngdialog-buttons">'+
-                    '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
-                '</div>';
-            
+              if(response.statusText==='Unauthorized'&&!flagLogInAgain){
+                var loginData = $localStorage.getObject('userinfo','{}');
+                authFac.login(loginData,true,loginData.username);
+              } else {
+                isAuthenticated = false;
+                var message = ''+
+                  '<div class="ngdialog-message">'+
+                  '<div><h3>Login Unsuccessful</h3></div>' +
+                    '<div><p>' +  response.data.err.message + '</p><p>' +
+                      response.data.err.name + '</p></div>' +
+                  '<div class="ngdialog-buttons">'+
+                      '<button type="button" class="ngdialog-button ngdialog-button-primary" ng-click=confirm("OK")>OK</button>'+
+                  '</div>';
+              
                 ngDialog.openConfirm({ template: message, plain: 'true'});
+              }
            }
         
         );
