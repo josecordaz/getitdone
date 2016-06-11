@@ -3,6 +3,7 @@
 angular.module('getItDoneApp')
 .constant("baseURL", "http://localhost:6002/")
 //.constant("baseURL", "https://localhost:3443/")
+///:goalId/tasks/:taskId/pomodoro
 .factory('taskFactory',['$resource','baseURL',function($resource,baseURL){
     return $resource(baseURL+"goals/:idGoal/tasks/:idTask",{idGoal:"@IdGoal",idTask:"@IdTask"},{
       'update':{
@@ -10,6 +11,14 @@ angular.module('getItDoneApp')
       },
       'delete':{
         method:'DELETE'
+      }
+    });
+}])
+.factory('pomodorosFactory',['$resource','baseURL',function($resource,baseURL){
+    return $resource(baseURL+"goals/:idGoal/tasks/:idTask/pomodoro/:idPomodoro",
+      {idGoal:"@IdGoal",idTask:"@IdTask",idPomodoro:"@IdPomodoro"},{
+      'update':{
+        method:'PUT'
       }
     });
 }])
