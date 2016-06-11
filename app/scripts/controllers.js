@@ -276,36 +276,12 @@ angular.module('getItDoneApp')
     //$rootScope.$broadcast('updateGoals', 'message');
     //$rootScope.$broadcast('updateGoals');
 
-    var updateGoals = function(){
-        goalsFactory.query({}).$promise.then(
-            function (response) {
-                response = response.map(function(val){
-                    val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
-                    val.tasks = val.tasks.map(function(task){
-                        task.startDate = moment(task.startDate).format("dddd, MMM DD, YYYY");
-                        task.daysWeek = task.daysWeek.join(", ");
-                        task.hoursWorded = Math.round(task.workedPomodoros.length * (25/60) * 100)/100;
-                        return task;
-                    });
-                    return val;
-                });
-                $rootScope.goals = response;
-                $scope.goals = $rootScope.goals;
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
-    };
-
-    $scope.$on('updateGoals', function () { 
-        updateGoals();
-    });
+    
 
 
     if (AuthFactory.isAuthenticated) {
         $rootScope.username = AuthFactory.getUsername();
-        updateGoals();
+        $rootScope.$broadcast('updateGoals');
     }
     
 }])
@@ -368,7 +344,40 @@ angular.module('getItDoneApp')
     };
 }])
 
-.controller('HeaderController', ['$scope', '$state', '$rootScope', 'ngDialog', 'AuthFactory',function ($scope, $state, $rootScope, ngDialog, AuthFactory) {
+.controller('HeaderController', ['$scope', '$state', '$rootScope', 'ngDialog', 'AuthFactory','goalsFactory',function ($scope, $state, $rootScope, ngDialog, AuthFactory,goalsFactory) {
+
+    var updateGoals = function(fun){
+        goalsFactory.query({}).$promise.then(
+            function (response) {
+                response = response.map(function(val){
+                    val.dueDate = moment(val.dueDate).format("dddd, MMM DD, YYYY");
+                    val.tasks = val.tasks.map(function(task){
+                        task.startDate = moment(task.startDate).format("dddd, MMM DD, YYYY");
+                        task.daysWeek = task.daysWeek.join(", ");
+                        task.value = task.description;
+                        task.hoursWorded = Math.round(task.workedPomodoros.length * (25/60) * 100)/100;
+                        return task;
+                    });
+                    return val;
+                });
+                $rootScope.goals = response.map(function(cv){
+                    cv.value = cv.description;
+                    return cv;
+                });
+                if(!!fun){
+                    fun();
+                }
+                //$scope.goals = $rootScope.goals;
+            },
+            function (response) {
+                $scope.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
+    };
+
+    $scope.$on('updateGoals', function (event,fun) { 
+        updateGoals(fun);
+    });
 
     $scope.loggedIn = false;
     $scope.username = '';
@@ -377,7 +386,7 @@ angular.module('getItDoneApp')
         $scope.loggedIn = true;
         $scope.username = AuthFactory.getUsername();
         $rootScope.username = AuthFactory.getUsername();
-        $rootScope.$broadcast('updateGoals');
+        updateGoals();
     }
         
     $scope.openLogin = function () {
@@ -411,21 +420,48 @@ angular.module('getItDoneApp')
     
 }])
 
-.controller('PomodoroController',['$scope','$rootScope',function($scope,$rootScope){
-    $scope.feedback = {};
+.controller('PomodoroController',['$scope','$rootScope','$interval',function($scope,$rootScope,$interval){
+    $scope.pomodoro = {
+        goal:"",
+        timeLabel: moment(new Date('2016-06-11T00:25:00.000Z')).format('mm:ss'),
+        time: moment(new Date('2016-06-11T00:25:00.000Z'))
+    };
 
-     /*var channels = [{
-        value: "tel",
-        label: "Tel."
-    }, {
-        value: "Email",
-        label: "Email"
-    }];*/
+    $rootScope.$broadcast('updateGoals',function(){
+        $scope.goals = $rootScope.goals;
+    });
 
-    $rootScope.$broadcast('updateGoals');
-    //$scope.goals = $rootScope.goals;
+    $scope.cambio = function(){
+        $scope.goals.forEach(function(goal){
+            if(goal.description === $scope.pomodoro.goal){
+                $scope.tasks = goal.tasks;
+            }
+        });
+    };
 
-    //$scope.channels = channels;
+    var reloj;
+    var contador = -1;
+    $scope.iniciarPomodoro = function(){    
+        reloj = $interval(function(){
+            $scope.pomodoro.timeLabel =  moment($scope.pomodoro.time).subtract(contador++,'seconds').format('mm:ss');
+        }, 1000,1500);
+    };
+
+    $scope.detenerPomodoro = function(){
+        $interval.cancel(reloj);
+    };
+
+    $scope.resetPomodoro = function(){
+        $interval.cancel(reloj);
+        $scope.pomodoro.timeLabel =  moment($scope.pomodoro.time).subtract(0,'seconds').format('mm:ss');
+        contador = 1;
+    }
+
+
+
+    /*if (AuthFactory.isAuthenticated) {
+        $rootScope.$broadcast('updateGoals');
+    }*/
 }])
 
 .controller('LoginController', ['$scope', 'ngDialog', '$localStorage', 'AuthFactory', function ($scope, ngDialog, $localStorage, AuthFactory) {
